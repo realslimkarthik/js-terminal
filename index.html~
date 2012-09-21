@@ -1,0 +1,113 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="bootstrap-responsive.min.css">
+<script type="text/javascript" src="jquery-1.7.2.min.js"></script>
+<style type="text/css">
+body
+{
+overflow:hidden;
+}
+#menu-bar
+{
+height:10%;
+margin:0;
+padding:0;
+width:100%;
+}
+#terminal
+{
+background:black;
+height:80%;
+}
+#clipboard
+{
+position:absolute;
+left:-20%;
+width:0%;
+height:0%;
+}
+#prompt, #before, #after
+{
+float:left;
+color:green;
+position:relative;
+}
+.blinker
+{
+float:left;
+color:green;
+position:relative;
+background:black;
+width:8px;
+height:100%;
+}
+#prompt_blink
+{
+float:left;
+position:relative;
+width:8px;
+height:100%;
+}
+.vis
+{background:green;color:black;}
+.invi
+{background:black;color:green;}
+</style>
+<script type="text/javascript">
+
+////////////        Terminal Aesthetics!        ////////////
+
+
+
+var cmd, content, prompt_content = "<span class='blinker'></span>";
+function blink()
+{
+$('#prompt_blink').toggleClass('vis').toggleClass('invi');
+var t = setTimeout("blink()",700);
+}
+function build_command(content)
+{
+var position = $('#clipboard').prop("selectionStart");
+$('#before').html(content.substr(0,content.charAt(position)-1));
+$('#after').html(content.substr(content.charAt(position)+1),content.length-1);
+$('#prompt_blink').html(content.charAt(position));
+}
+window.onload = blink();
+$(document).ready(function() {
+$('#terminal').click(function() {
+$('#clipboard').focus();
+});
+$('#clipboard').keydown(function() {
+content = $(this).val();
+build_command(content);
+$('#test').html(cmd);
+$('#before').html(content);
+//$('#before').html(cmd);
+});
+$('#clipboard').keyup(function() {
+content = $(this).val();
+//var cmd = build_command(content);
+$('#before').html(content);
+//$('#before').html(cmd);
+});
+});
+
+
+
+////////////        Terminal Aesthetics!        ////////////
+
+</script>
+</head>
+<body>
+<div id="menu-bar" class="span12"></div>
+
+<div class="row">
+<div id="terminal" class="offset1 span12">
+<div id="line1" style="width:100%;height:18px;"><span id="prompt">karts-$ </span><span id="before"></span><span id="prompt_blink" class="vis"></span><span id="after"></span></div>
+</div>
+</div>
+<div class="offset1 span12"><p id="test"></p></div>
+<textarea id="clipboard"></textarea>
+</body>
+</html>
