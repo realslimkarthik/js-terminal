@@ -31,20 +31,28 @@ left:-20%;
 width:0%;
 height:0%;
 }
-#prompt, #before, #after
+.prompt, span.before, span.after
 {
 float:left;
 left:0px;
 color:#22FF08;
 position:relative;
 }
-#prompt_blink
+span.prompt_blink
 {
 float:left;
 left:0px;
 position:relative;
 width:8px;
-height:100%;
+height:18px;
+}
+.line
+{
+color:#22FF08;width:100%;height:18px;padding:0;margin:0;
+}
+.line1
+{
+width:100%;height:18px;padding:0;margin:0;
 }
 .vis
 {background:#22FF08	;color:black;}
@@ -53,26 +61,36 @@ height:100%;
 </style>
 <script type="text/javascript">
 
-////////////        Terminal Aesthetics!        ////////////
+////////////////////////        Terminal Aesthetics!        ////////////////////////
 
 
 
-var cmd, content, position, prompt_content = "<span class='blinker'></span>";
-var prompt = $('#prompt_blink');
-var before = $('#before');
-var after = $('#after');
+var cmd, content, position;
+var new_line = "<div class='line1'><span class='prompt'>karts-$ </span><span id='before'></span><span class='prompt_blink vis'></span><span class='after'></span></div>";
+var prompt = $('span.prompt_blink');
+var before = $('span.before');
+var after = $('span.after');
 
 function blink()
 {
-$('#prompt_blink').toggleClass('vis').toggleClass('invi');
+$('span.prompt_blink').toggleClass('vis').toggleClass('invi');
 var t = setTimeout("blink()",700);
 }
 
 function build_command(content,position)
 {
-$('#before').html(content.substr(0,position));
-$('#after').html(content.substr(position+1,content.length-1));
-$('#prompt_blink').html(content.charAt(position));
+$('span.before').html(content.substr(0,position));
+$('span.after').html(content.substr(position+1,content.length-1));
+$('span.prompt_blink').html(content.charAt(position));
+}
+
+function next_line()
+{
+var old_line = "<div class='line'><span class='prompt'>karts-$ </span><span>" + $('#clipboard').val() + "</span></div>";
+$('div.line1').css("color","black");
+$('#clipboard').val('');
+$('div.line1').css("color","#22FF08");
+$('div.line1').before(old_line);
 }
 
 window.onload = blink();
@@ -84,39 +102,41 @@ $('#clipboard').focus();
 
 $('#clipboard').keydown(function() {
 content = $(this).val();
-var position = $('#clipboard').prop("selectionStart");
-if(position<=content.length-1)
-build_command(content,position);
-else
-{
-$('#before').html(content);
-$('#prompt_blink').html('');
-$('#after').html('');
-}
+	var position = $('#clipboard').prop("selectionStart");
+	if(position<=content.length-1)
+	build_command(content,position);
+	else
+	{
+	$('span.before').html(content);
+	$('span.prompt_blink').html('');
+	$('span.after').html('');
+	}
+	if(event.which==13)
+		next_line();
 });
 
 $('#clipboard').keyup(function() {
-var position = $('#clipboard').prop("selectionStart");
 content = $(this).val();
-if(position<=content.length-1)
-build_command(content,position);
+	var position = $('#clipboard').prop("selectionStart");
+	if(position<=content.length-1)
+	build_command(content,position);
+	else
+	{
+	$('span.before').html(content);
+	$('span.prompt_blink').html('');
+	$('span.after').html('');
+	}
+if($('span.prompt_blink').html()=='')
+$('span.prompt_blink').css('width','8px');
 else
-{
-$('#before').html(content);
-$('#prompt_blink').html('');
-$('#after').html('');
-}
-if($('#prompt_blink').html()=='')
-$('#prompt_blink').css('width','8px');
-else
-$('#prompt_blink').css('width','auto');
+$('span.prompt_blink').css('width','auto');
 });
 
 });
 
 
 
-////////////        Terminal Aesthetics!        ////////////
+////////////////////////        Terminal Aesthetics!        ////////////////////////
 
 </script>
 </head>
@@ -125,7 +145,7 @@ $('#prompt_blink').css('width','auto');
 
 <div class="row">
 <div id="terminal" class="offset1 span12">
-<div id="line1" style="width:100%;height:18px;"><span id="prompt">karts-$ </span><span id="before"></span><span id="prompt_blink" class="vis"></span><span id="after"></span></div>
+<div class="line1"><span class="prompt">karts-$ </span><span class="before"></span><span class="prompt_blink vis"></span><span class="after"></span></div>
 </div>
 </div>
 <div class="offset1 span12"><p id="test"></p></div>
