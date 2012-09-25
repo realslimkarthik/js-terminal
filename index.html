@@ -2,6 +2,7 @@
 <head>
 <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="bootstrap-responsive.min.css">
+<link href='http://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'>
 <script type="text/javascript" src="jquery-1.7.2.min.js"></script>
 <style type="text/css">
 body
@@ -17,6 +18,9 @@ width:100%;
 }
 #terminal
 {
+font-family:Inconsolata;
+font-size:15px;
+padding:10px;
 background:black;
 height:80%;
 }
@@ -30,29 +34,22 @@ height:0%;
 #prompt, #before, #after
 {
 float:left;
-color:green;
+left:0px;
+color:#22FF08;
 position:relative;
-}
-.blinker
-{
-float:left;
-color:green;
-position:relative;
-background:black;
-width:8px;
-height:100%;
 }
 #prompt_blink
 {
 float:left;
+left:0px;
 position:relative;
 width:8px;
 height:100%;
 }
 .vis
-{background:green;color:black;}
+{background:#22FF08	;color:black;}
 .invi
-{background:black;color:green;}
+{background:black;color:#22FF08;}
 </style>
 <script type="text/javascript">
 
@@ -60,37 +57,61 @@ height:100%;
 
 
 
-var cmd, content, prompt_content = "<span class='blinker'></span>";
+var cmd, content, position, prompt_content = "<span class='blinker'></span>";
+var prompt = $('#prompt_blink');
+var before = $('#before');
+var after = $('#after');
+
 function blink()
 {
 $('#prompt_blink').toggleClass('vis').toggleClass('invi');
 var t = setTimeout("blink()",700);
 }
-function build_command(content)
+
+function build_command(content,position)
 {
-var position = $('#clipboard').prop("selectionStart");
-$('#before').html(content.substr(0,content.charAt(position)-1));
-$('#after').html(content.substr(content.charAt(position)+1),content.length);
+$('#before').html(content.substr(0,position));
+$('#after').html(content.substr(position+1,content.length-1));
 $('#prompt_blink').html(content.charAt(position));
 }
+
 window.onload = blink();
 $(document).ready(function() {
+$('#clipboard').focus();
 $('#terminal').click(function() {
 $('#clipboard').focus();
 });
+
 $('#clipboard').keydown(function() {
 content = $(this).val();
-build_command(content);
-$('#test').html(cmd);
+var position = $('#clipboard').prop("selectionStart");
+if(position<=content.length-1)
+build_command(content,position);
+else
+{
 $('#before').html(content);
-//$('#before').html(cmd);
+$('#prompt_blink').html('');
+$('#after').html('');
+}
 });
+
 $('#clipboard').keyup(function() {
+var position = $('#clipboard').prop("selectionStart");
 content = $(this).val();
-//var cmd = build_command(content);
+if(position<=content.length-1)
+build_command(content,position);
+else
+{
 $('#before').html(content);
-//$('#before').html(cmd);
+$('#prompt_blink').html('');
+$('#after').html('');
+}
+if($('#prompt_blink').html()=='')
+$('#prompt_blink').css('width','8px');
+else
+$('#prompt_blink').css('width','auto');
 });
+
 });
 
 
