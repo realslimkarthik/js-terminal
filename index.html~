@@ -31,14 +31,14 @@ left:-20%;
 width:0%;
 height:0%;
 }
-.prompt, span.before, span.after
+.prompt, #before, #after
 {
 float:left;
 left:0px;
 color:#22FF08;
 position:relative;
 }
-span.prompt_blink
+#prompt_blink
 {
 float:left;
 left:0px;
@@ -61,66 +61,65 @@ width:100%;height:18px;padding:0;margin:0;
 </style>
 <script type="text/javascript">
 
+////////////////////////        Keywords        ////////////////////////
+
+var keywords = {'ls':'',};
+
+
+
+////////////////////////        Keywords        ////////////////////////
+
+</script>
+<script type="text/javascript">
+
 ////////////////////////        Terminal Aesthetics!        ////////////////////////
 
 
 
 var cmd, content, position;
-var new_line = "<div class='line1'><span class='prompt'>karts-$ </span><span id='before'></span><span class='prompt_blink vis'></span><span class='after'></span></div>";
-var prompt = $('span.prompt_blink');
-var before = $('span.before');
-var after = $('span.after');
+var prompt = $('#prompt_blink');
+var before = $('#before');
+var after = $('#after');
+var t;
 
 function blink()
 {
-$('span.prompt_blink').toggleClass('vis').toggleClass('invi');
-var t = setTimeout("blink()",700);
+$('#prompt_blink').toggleClass('vis').toggleClass('invi');
+t = setTimeout("blink()",700);
 }
 
 function build_command(content,position)
 {
-$('span.before').html(content.substr(0,position));
-$('span.after').html(content.substr(position+1,content.length-1));
-$('span.prompt_blink').html(content.charAt(position));
+$('#before').html(content.substr(0,position));
+$('#after').html(content.substr(position+1,content.length-1));
+$('#prompt_blink').html(content.charAt(position));
 }
 
 function next_line()
 {
-var old_line = "<div class='line'><span class='prompt'>karts-$ </span><span>" + $('#clipboard').val() + "</span></div>";
-$('div.line1').css("color","black");
+var old_line = "<div class='line'><span class='prompt'>karts-$ </span><span>" + $('#clipboard').val(); + "</span></div>";
 $('#clipboard').val('');
-$('div.line1').css("color","#22FF08");
 $('div.line1').before(old_line);
 }
-/*
-function next_line()
-{
-var old_line = "<span class='prompt'>karts-$ </span><span>" + $('#clipboard').val() + "</span>";
-$('div.line1').html(old_line);
-var prev = $('div.line1');
-$('div.line1').addClass('line').removeClass('line1');
-$('#terminal').html($('#terminal').html() + '<br>' + new_line);
-$('#clipboard').val('');
-}
-//*/
 
-window.onload = blink();
 $(document).ready(function() {
 $('#clipboard').focus();
 $('#terminal').click(function() {
 $('#clipboard').focus();
+blink();
 });
 
 $('#clipboard').keydown(function() {
 content = $(this).val();
+clearTimeout(t);
 	var position = $('#clipboard').prop("selectionStart");
 	if(position<=content.length-1)
 	build_command(content,position);
 	else
 	{
-	$('span.before').html(content);
-	$('span.prompt_blink').html('');
-	$('span.after').html('');
+	$('#before').html(content);
+	$('#prompt_blink').html('');
+	$('#after').html('');
 	}
 	if(event.which==13)
 		next_line();
@@ -128,19 +127,20 @@ content = $(this).val();
 
 $('#clipboard').keyup(function() {
 content = $(this).val();
+blink();
 	var position = $('#clipboard').prop("selectionStart");
 	if(position<=content.length-1)
 	build_command(content,position);
 	else
 	{
-	$('span.before').html(content);
-	$('span.prompt_blink').html('');
-	$('span.after').html('');
+	$('#before').html(content);
+	$('#prompt_blink').html('');
+	$('#after').html('');
 	}
-if($('span.prompt_blink').html()=='')
-$('span.prompt_blink').css('width','8px');
+if($('#prompt_blink').html()=='')
+$('#prompt_blink').css('width','8px');
 else
-$('span.prompt_blink').css('width','auto');
+$('#prompt_blink').css('width','auto');
 });
 
 });
@@ -156,10 +156,9 @@ $('span.prompt_blink').css('width','auto');
 
 <div class="row">
 <div id="terminal" class="offset1 span12">
-<div class="line1"><span class="prompt">karts-$ </span><span class="before"></span><span class="prompt_blink vis"></span><span class="after"></span></div>
+<div class="line1"><span class="prompt">karts-$ </span><span id="before"></span><span id="prompt_blink" class="vis"></span><span id="after"></span></div>
 </div>
 </div>
-<div class="offset1 span12"><p id="test"></p></div>
 <textarea id="clipboard"></textarea>
 </body>
 </html>
