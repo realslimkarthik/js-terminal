@@ -2,12 +2,15 @@ var cmd, content, position;
 var prompt = $('#prompt_blink');
 var before = $('#before');
 var after = $('#after');
-var t;
+var t,pause,wait=0;
 
 function blink()
 {
+if(wait==0)
+{
 $('#prompt_blink').toggleClass('vis').toggleClass('invi');
 t = setTimeout("blink()",700);
+}
 }
 
 function build_command(content,position)
@@ -31,13 +34,12 @@ $('#clipboard').focus();
 blink();
 });
 
-$('#clipboard').keypress(function() {
-clearTimeout(t);
-});
-
 $('#clipboard').keydown(function() {
 content = $(this).val();
 clearTimeout(t);
+clearTimeout(pause);
+wait = 1;
+$('#prompt_blink').addClass('vis').removeClass('invi');
 	var position = $('#clipboard').prop("selectionStart");
 	if(position<=content.length-1)
 	build_command(content,position);
@@ -53,7 +55,12 @@ clearTimeout(t);
 
 $('#clipboard').keyup(function() {
 content = $(this).val();
-blink();
+if(wait==1)
+{
+wait = 0;
+pause = setTimeout("blink()",700);
+
+}
 	var position = $('#clipboard').prop("selectionStart");
 	if(position<=content.length-1)
 	build_command(content,position);
