@@ -38,17 +38,12 @@ function login(param)
 	$('#clipboard').keyup(function(event.which) {
 		if(event.which==37)
 			$(this).prop('selectionStart') = $(this).val().length;
-		else if(event.which==13)
-			next_line();
 	});
 }
 
 $(document).ready(function() {
 	$('div.line1').before("<div class='line'><span class='prompt'>karts-$ </span><span>Login</span><br/><span>Enter your details</span></div>");
 	$('#clipboard').focus();
-	login('domain');
-	login('username');
-	login('password');
 	$('#terminal').click(function() {
 		$('#clipboard').focus();
 		blink();
