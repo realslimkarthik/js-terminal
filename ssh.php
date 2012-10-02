@@ -1,15 +1,21 @@
 <?php
 session_start();
+// error codes - 5
 if(!isset($_SESSION['connected']))
 {
 $domain = $_POST['domain'];
 $user = $_POST['user'];
 $pass = $_POST['password'];
-$command = $_POST['command'];
-/*$domain = "web324.webfaction.com";
-$user = "ssngeek";
-$pass = "f7e08c8b";
-$command = "ls -l";*/
+
+if((!isset($domain)) || (!isset($user))|| (!isset($pass)))
+{
+	$response['error'] = 1;
+	$response['errorcode'] = 5;
+	$response['error_msg'] = "Otha!! enna da nadakuthu inga? :|";
+	echo json_encode($response);
+	exit(0);
+	}
+
 $ssh_conn = ssh2_connect($domain, 22);
 if(!ssh_conn)
 {
@@ -30,7 +36,17 @@ if(ssh2_auth_password($ssh_conn, $user, $pass) == false)
 //store the values in a session
 $_SESSION['connected'] = 1;
 $_SESSION['connection'] = $ssh_conn;
-
+$response['error'] = 0;
+$response['auth'] = 1;
+$response['auth_msg'] = "Authentication Sucess!!";
+echo json_encode($response);
+exit(0);
+}
+else
+{
+$command = $_GET['command'];
+if(isset($command))
+{
 //execute command
 $ostream = ssh2_exec($ssh_conn ,$command. '\n');
 if($ostream == false)
@@ -67,15 +83,13 @@ else
 	$response['command'] = $command;
 	$response['output'] = $output;
 	echo json_encode($response);
-	}
+	}	
 }
-else
-{
-	
+
 }
 function changedir($newpath)
 {
 	$command = "cd";
-	$com_comm = $command . " '" . $newpath . "'"
+	$com_comm = $command . " '" . $newpath . "'";
 	}
 ?>
