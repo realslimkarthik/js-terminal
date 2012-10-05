@@ -5,7 +5,7 @@ var after = $('#after');
 var t,pause,wait=0;
 var old_line = "<div class='line'><span class='prompt'>karts-$ </span><span>" + $('#clipboard').val(); + "</span></div>";
 var o/p = "<div class='output'><span class='response'>" + response + "</span></div>";
-
+var credentials = [];
 
 function blink()
 {
@@ -32,23 +32,35 @@ function next_line()
 	//$('div.line1').before(
 }
 
-function login(param)
+function get_data(param)
 {
 	$('#before').html(param);
+	if(param == "password:")
+		$('#after').css('color', 'black');
 	$('#clipboard').keyup(function(event.which) {
 		if(event.which==37)
 			$(this).prop('selectionStart') = $(this).val().length;
 		else if(event.which==13)
+		{
 			next_line();
+			$('#after').css('color', '#22FF08');
+			credentials.push($(this).val());
+		}
 	});
+}
+
+function login()
+{
+	$.post()
 }
 
 $(document).ready(function() {
 	$('div.line1').before("<div class='line'><span class='prompt'>karts-$ </span><span>Login</span><br/><span>Enter your details</span></div>");
 	$('#clipboard').focus();
-	login('domain');
-	login('username');
-	login('password');
+	get_data('domain:');
+	get_data('username:');
+	get_data('password:');
+	login();
 	$('#terminal').click(function() {
 		$('#clipboard').focus();
 		blink();
