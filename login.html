@@ -22,11 +22,6 @@
     <![endif]-->
 
     <!-- Le fav and touch icons -->
-    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
   </head>
 
   <body>
@@ -65,28 +60,28 @@
     <div class="container">
     <div class="row">
      <div class="offset4 span4">
-	<form class="form-horizontal" action="ssh.php" method="post">
-	  <div class="control-group">
+	<form class="form-horizontal" id="Auth" name="Auth" action="ssh.php" method="post" onsubmit="return validate();">
+	  <div id="domain_cg" class="control-group">
 	    <label class="control-label" for="domain">Domain</label>
 	    <div class="controls">
-		 <input type="text" id="domain" placeholder="Domain">
+		 <input type="text" name="domain" id="domain" placeholder="Domain">
 	    </div>
 	  </div>
-	  <div class="control-group">
+	  <div id="user_cg" class="control-group">
 	    <label class="control-label" for="user">Username</label>
 	    <div class="controls">
-		 <input type="text" id="user" placeholder="Username">
+		 <input type="text" name="user" id="user" placeholder="Username">
 	    </div>
 	  </div>
-	  <div class="control-group">
+	  <div id="password_cg" class="control-group">
 	    <label class="control-label" for="password">Password</label>
 	    <div class="controls">
-		 <input type="password" id="password" placeholder="Password">
+		 <input type="password" name="password" id="password" placeholder="Password">
 	    </div>
 	  </div>
 	  <div class="control-group">
 	    <div class="controls">
-		 <button type="submit" class="btn">Sign in</button>
+		 <input type="submit" class="btn" val="Sign In" />
 	    </div>
 	  </div>
 	</form>
@@ -111,10 +106,51 @@
     <script src="../assets/js/bootstrap-carousel.js"></script>
     <script src="../assets/js/bootstrap-typeahead.js"></script>
     -->
+    <script type="text/javascript" src="jquery-1.7.2.min.js"></script>
+    <script type="text/javascript">
+    function validate()
+    {
+        var error = true;
+        if($('domain').val() == '')
+        {
+            error = false;
+            $('domain_cg').addClass('error');
+        }
+        if($('user').val() == '')
+        {
+            error = false;
+            $('user_cg').addClass('error');
+        }
+        if($('password').val() == '')
+        {
+            error = false;
+            $('password_cg').addClass('error');
+        }
+        return error;
+    }
+    
+    $(document).ready(function() {
+        $("form").submit(function(){
+            var ret = validate();
+            if(ret==0)
+            {
+                $.post("ssh.php", $('#Auth').serialize(),
+                  function(data){
+                    $('domain_cg').removeClass('error');
+                    $('user_cg').removeClass('error');
+                    $('password_cg').removeClass('error');
+                    //parsed = data.
+                });
+            }
+            else
+                return;
+        });
+    });
+    </script>
 
     <hr>
-    <footer>
-      <p>©Evil.Inc 2012</p>
+    <footer style="padding-right:30px;">
+      <p style="float:right;">Evil.Inc 2012</p>
     </footer>
   </body>
 </html>
