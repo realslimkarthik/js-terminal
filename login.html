@@ -60,7 +60,7 @@
     <div class="container">
     <div class="row">
      <div class="offset4 span4">
-	<form class="form-horizontal" id="Auth" name="Auth" action="ssh.php" method="post" onsubmit="return validate();">
+	<form class="form-horizontal" id="Auth" name="Auth" method="post" onsubmit="return validate();">
 	  <div id="domain_cg" class="control-group">
 	    <label class="control-label" for="domain">Domain</label>
 	    <div class="controls">
@@ -132,10 +132,11 @@
     $(document).ready(function() {
         $("form").submit(function(){
             var ret = validate();
-            if(ret==0)
+            if(ret)
             {
                 $.post("ssh.php", $('#Auth').serialize(),
                   function(data){
+                    alert(data);
                     $('domain_cg').removeClass('error');
                     $('user_cg').removeClass('error');
                     $('password_cg').removeClass('error');
