@@ -1,10 +1,10 @@
 var cmd, content, position;
+var user;
 var prompt = $('#prompt_blink');
 var before = $('#before');
 var after = $('#after');
 var t,pause,wait=0;
-var old_line = "<div class='line'><span class='prompt'>karts-$ </span><span>" + $('#clipboard').val(); + "</span></div>";
-var o/p = "<div class='output'><span class='response'>" + response + "</span></div>";
+//var o/p = "<div class='output'><span class='response'>" + response + "</span></div>";
 var credentials = [];
 
 function blink()
@@ -25,42 +25,31 @@ function build_command(content,position)
 
 function next_line()
 {
-	var response;
-	//$.ajax('ssh.php','GET');
+	var old_line = "<div class='line'><span class='prompt'>" + user + " </span><span>" + $('#clipboard').val(); + "</span></div>";
 	$('#clipboard').val('');
 	$('div.line1').before(old_line);
-	//$('div.line1').before(
 }
 
 function get_data(param)
 {
-	$('#before').html(param);
-	if(param == "password:")
-		$('#after').css('color', 'black');
-	$('#clipboard').keyup(function(event.which) {
+	$('#username').html(param);
+	$('#clipboard').keydown(function(event) {
 		if(event.which==37)
 			$(this).prop('selectionStart') = $(this).val().length;
 		else if(event.which==13)
 		{
+			user = $('#clipboard').val() + "-$ ";
+			$('#username').html(user);
 			next_line();
 			$('#after').css('color', '#22FF08');
-			credentials.push($(this).val());
 		}
 	});
 }
 
-function login()
-{
-	$.post()
-}
-
 $(document).ready(function() {
-	$('div.line1').before("<div class='line'><span class='prompt'>karts-$ </span><span>Login</span><br/><span>Enter your details</span></div>");
+	$('div.line1').before("<div class='line'><span>Enter your Username:</span></div><br>");
 	$('#clipboard').focus();
-	get_data('domain:');
-	get_data('username:');
-	get_data('password:');
-	login();
+	get_data('Username:');
 	$('#terminal').click(function() {
 		$('#clipboard').focus();
 		blink();
@@ -107,5 +96,4 @@ $(document).ready(function() {
 	else
 		$('#prompt_blink').css('width','auto');
 	});
-
 });
