@@ -1,5 +1,6 @@
 var cmd, content, position;
 var user;
+var pre = 1;
 var prompt = $('#prompt_blink');
 var before = $('#before');
 var after = $('#after');
@@ -23,6 +24,16 @@ function build_command(content,position)
 	$('#prompt_blink').html(content.charAt(position));
 }
 
+function welcome() {
+	user = $('#clipboard').val() + "-$ ";
+	$('#username').html(user);
+	$('#after').css('color', '#22FF08');
+	var old_line = "<div class='line'><span class='prompt'>Welcome " + $('#clipboard').val(); + "</span></div>";
+	$('#clipboard').val('');
+	$('div.line1').before(old_line);
+	pre = 0;
+}
+
 function next_line()
 {
 	var old_line = "<div class='line'><span class='prompt'>" + user + " </span><span>" + $('#clipboard').val(); + "</span></div>";
@@ -33,15 +44,12 @@ function next_line()
 function get_data(param)
 {
 	$('#username').html(param);
-	$('#clipboard').keydown(function(event) {
+	$('#clipboard').keyup(function() {
 		if(event.which==37)
 			$(this).prop('selectionStart') = $(this).val().length;
-		else if(event.which==13)
+		else if(event.which==13 && pre==1)
 		{
-			user = $('#clipboard').val() + "-$ ";
-			$('#username').html(user);
-			next_line();
-			$('#after').css('color', '#22FF08');
+			welcome();
 		}
 	});
 }
@@ -70,7 +78,7 @@ $(document).ready(function() {
 			$('#prompt_blink').html('');
 			$('#after').html('');
 		}
-		if(event.which==13)
+		if(event.which==13 && pre==0)
 			next_line();
 	});
 
