@@ -1,7 +1,7 @@
 var content, position;
 var cmd = {"comm":"", "mode":"", "params":""};
 var user;
-var pre = 1;
+var pre = 1, appendMode = 0;
 var prompt = $('#prompt_blink');
 var before = $('#before');
 var after = $('#after');
@@ -140,27 +140,53 @@ $(document).ready(function() {
       			}
     		}, errorHandler);
 		};
-
 		readEntries();
+		alert(entries);
 	}
 
-	function cd(dirName) {
+	function cd(fs, dirName) {
 		alert("cd called");
 	}
 
-	function cat(fileName, mode) {
-		alert("cat called");
+	function cat(fs, fileName, mode) {
+		//alert("cat called");
+			if(fileName)
+			{
+				if(mode == ">>")
+				{
+					//alert("cat in write mode");
+					fs.root.getFile(fileName, {create: true, exclusive: false}, function(fileEntry) {
+						fileEntry.createWriter(function(fileWriter) {
+							fileWriter.onwriteend = function(e) {
+								console.log("Write Completed!");
+							};
+							fileWriter.onerror = function(e) {
+								console.log("Write failed: " + e.toString());
+							};
+							/* Data to be written goes here! */
+			
+						}, errorHandler);
+					}, errorHandler);
+				}
+				else {
+					alert("cat in read mode");
+						/* Read mode of the cat command */
+				}
+			} else {
+				var old_line = "<div class='line'><span class='prompt'>File name not specified!</span></div>";
+				$('div.line1').before(old_line);
+			}
 	}
 
-	function rm(fileName) {
+	function rm(fs, fileName) {
 		alert("rm called");
 	}
 
-	function mkdir(dirName) {
+	function mkdir(fs, dirName) {
 		alert("mkdir called");
 	}
 
-	function rmdir(dirName) {
+	function rmdir(fs, dirName) {
 		alert("rmdir called");
 	}
 
