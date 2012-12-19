@@ -1,11 +1,11 @@
-var cmd, content, position;
+var content, position;
+var cmd = {"comm":"", "mode":"", "params":""};
 var user;
 var pre = 1;
 var prompt = $('#prompt_blink');
 var before = $('#before');
 var after = $('#after');
 var t,pause,wait=0;
-//var o/p = "<div class='output'><span class='response'>" + response + "</span></div>";
 var credentials = [];
 
 function blink()
@@ -36,16 +36,30 @@ function welcome() {
 
 function next_line()
 {
-	var old_line = "<div class='line'><span class='prompt'>" + user + " </span><span>" + $('#clipboard').val(); + "</span></div>";
+	var line = $("#clipboard").val();
+	var old_line = "<div class='line'><span class='prompt'>" + user + " </span><span>" + line + "</span></div>";
+	var ind = line.indexOf(" ");
+	if(ind + 1) {
+		cmd["comm"] = line.substring(0, ind);
+		line = line.substring(ind + 1);
+		ind = line.indexOf(" ");
+		if(ind + 1) {
+			cmd["mode"] = line.substring(0, ind);
+			line = line.substring(ind + 1);
+			cmd["params"] = line;
+		}
+		else {
+			cmd["params"] = line;	
+		}
+	}
 	$('#clipboard').val('');
 	$('div.line1').before(old_line);
 }
 
-function get_data(param)
+function get_data()
 {
-	$('#username').html(param);
 	$('#clipboard').keyup(function() {
-		if(event.which==37)
+		if(event.which==37 && pre==1)
 			$(this).prop('selectionStart') = $(this).val().length;
 		else if(event.which==13 && pre==1)
 		{
@@ -57,7 +71,8 @@ function get_data(param)
 $(document).ready(function() {
 	$('div.line1').before("<div class='line'><span>Enter your Username:</span></div><br>");
 	$('#clipboard').focus();
-	get_data('Username:');
+	$('#username').html('Username:');
+	get_data();
 	$('#terminal').click(function() {
 		$('#clipboard').focus();
 		blink();
@@ -77,9 +92,7 @@ $(document).ready(function() {
 			$('#before').html(content);
 			$('#prompt_blink').html('');
 			$('#after').html('');
-		}
-		if(event.which==13 && pre==0)
-			next_line();
+		}	
 	});
 
 	$('#clipboard').keyup(function() {
@@ -104,4 +117,135 @@ $(document).ready(function() {
 	else
 		$('#prompt_blink').css('width','auto');
 	});
+
+	function ls() {
+		var dirReader = fs.root.createReader();
+		var entries = [];
+		var readEntries = function() {
+			dirReader.readEntries(function(results) {
+				if (!results.length) {
+        			listResults(entries.sort());
+      			} else {
+        			entries = entries.concat(toArray(results));
+        			readEntries();
+      			}
+    		}, errorHandler);
+		};
+
+		readEntries();
+	}
+
+	function cd(dirName) {
+
+	}
+
+	function cat(fileName, mode) {
+
+	}
+
+	function rm(fileName) {
+
+	}
+
+	function mkdir(dirName) {
+
+	}
+
+	function rmdir(dirName) {
+
+	}
+
+	function command(cmd) {
+		switch(cmd["comm"]) {
+			case "ls":
+				ls();
+			break;
+			case "cd":
+				cd(cmd["params"]);
+			break;
+			case "cat":
+				cat(cmd["params"], cmd["mode"]);
+			break;
+			case "rm":
+				rm(cmd["params"]);
+			break;
+			case "mkdir":
+				mkdir(cmd["params"]);
+			break;
+			case "rmdir":
+				rmdir(cmd["params"]);
+			break;
+			default:
+				alert("Invalid Command name");
+		}
+	}
+
+	function onInitFs(fs) {
+		
+		$("#clipboard").keydown(function() {
+			if(event.which == 13 && pre == 0) {
+				next_line();
+				command(cmd);
+			}
+		});
+
+		/*fs.root.getFile("log.txt", {create: true, exclusive: false}, function(fileEntry) {
+
+			fileEntry.createWriter(function(fileWriter) {
+				fileWriter.onwriteend = function(e) {
+					console.log("Write Completed!");
+				};
+				fileWriter.onerror = function(e) {
+					console.log("Write failed: " + e.toString());
+				};
+
+				var blob = new Blob(['Lorem Ipsum'], {type: 'text/plain'});
+
+				fileWriter.write(blob);
+			}, errorHandler);
+
+			fileEntry.file(function(file) {
+				var reader = new FileReader();
+
+				reader.onloadend = function(e) {
+					var txtArea = document.createElement("textarea");
+					txtArea.value = this.result;
+					alert(this.result);
+					document.body.appendChild(txtArea);
+					console.log("read completed!");
+				};
+
+				reader.readAsText(file);
+			}, errorHandler);
+		//*/
+		}, errorHandler);
+
+  		console.log('Opened file system: ' + fs.name);
+	}
+	function errorHandler(e) {
+  		var msg = '';
+		  switch (e.code) {
+		    case FileError.QUOTA_EXCEEDED_ERR:
+		      msg = 'QUOTA_EXCEEDED_ERR';
+		      break;
+		    case FileError.NOT_FOUND_ERR:
+		      msg = 'NOT_FOUND_ERR';
+		      break;
+		    case FileError.SECURITY_ERR:
+		      msg = 'SECURITY_ERR';
+		      break;
+		    case FileError.INVALID_MODIFICATION_ERR:
+		      msg = 'INVALID_MODIFICATION_ERR';
+		      break;
+		    case FileError.INVALID_STATE_ERR:
+		      msg = 'INVALID_STATE_ERR';
+		      break;
+		    default:
+		      msg = 'Unknown Error';
+		      break;
+  };
+  console.log('Error: ' + msg);
+}
+	window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+	window.requestFileSystem(window.TEMPORARY, 5*1024*1024 /*5MB*/, onInitFs, errorHandler);
 });
