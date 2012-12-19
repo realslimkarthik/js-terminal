@@ -39,20 +39,28 @@ function next_line()
 	var line = $("#clipboard").val();
 	var old_line = "<div class='line'><span class='prompt'>" + user + " </span><span>" + line + "</span></div>";
 	var ind = line.indexOf(" ");
+	cmd["comm"] = "";
+	cmd["mode"] = "";
+	cmd["params"] = "";
 	if(ind + 1) {
 		cmd["comm"] = line.substring(0, ind);
+		cmd["comm"] = $.trim(cmd["comm"]);
 		line = line.substring(ind + 1);
 		ind = line.indexOf(" ");
 		if(ind + 1) {
 			cmd["mode"] = line.substring(0, ind);
 			line = line.substring(ind + 1);
-			cmd["params"] = line;
+			cmd["mode"] = $.trim(cmd["mode"]);
 		}
-		else {
-			cmd["params"] = line;	
-		}
+		cmd["params"] = $.trim(line);
+	} else {
+		cmd["comm"] = $.trim(line);
 	}
+	//alert(cmd["comm"]);
 	$('#clipboard').val('');
+	$("#before").html("");
+	$("#after").html("");
+	$("#prompt_blink").html("");
 	$('div.line1').before(old_line);
 }
 
@@ -118,7 +126,8 @@ $(document).ready(function() {
 		$('#prompt_blink').css('width','auto');
 	});
 
-	function ls() {
+	function ls(fs) {
+		alert("ls called");
 		var dirReader = fs.root.createReader();
 		var entries = [];
 		var readEntries = function() {
@@ -136,29 +145,29 @@ $(document).ready(function() {
 	}
 
 	function cd(dirName) {
-
+		alert("cd called");
 	}
 
 	function cat(fileName, mode) {
-
+		alert("cat called");
 	}
 
 	function rm(fileName) {
-
+		alert("rm called");
 	}
 
 	function mkdir(dirName) {
-
+		alert("mkdir called");
 	}
 
 	function rmdir(dirName) {
-
+		alert("rmdir called");
 	}
 
-	function command(cmd) {
+	function command(fs, cmd) {
 		switch(cmd["comm"]) {
 			case "ls":
-				ls();
+				ls(fs);
 			break;
 			case "cd":
 				cd(cmd["params"]);
@@ -185,7 +194,7 @@ $(document).ready(function() {
 		$("#clipboard").keydown(function() {
 			if(event.which == 13 && pre == 0) {
 				next_line();
-				command(cmd);
+				command(fs, cmd);
 			}
 		});
 
@@ -217,8 +226,8 @@ $(document).ready(function() {
 
 				reader.readAsText(file);
 			}, errorHandler);
-		//*/
 		}, errorHandler);
+	//*/
 
   		console.log('Opened file system: ' + fs.name);
 	}
