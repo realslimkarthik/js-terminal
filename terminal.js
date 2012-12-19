@@ -170,19 +170,19 @@ $(document).ready(function() {
 				ls(fs);
 			break;
 			case "cd":
-				cd(cmd["params"]);
+				cd(fs, cmd["params"]);
 			break;
 			case "cat":
-				cat(cmd["params"], cmd["mode"]);
+				cat(fs, cmd["params"], cmd["mode"]);
 			break;
 			case "rm":
-				rm(cmd["params"]);
+				rm(fs, cmd["params"]);
 			break;
 			case "mkdir":
-				mkdir(cmd["params"]);
+				mkdir(fs, cmd["params"]);
 			break;
 			case "rmdir":
-				rmdir(cmd["params"]);
+				rmdir(fs, cmd["params"]);
 			break;
 			default:
 				alert("Invalid Command name");
