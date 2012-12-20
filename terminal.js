@@ -1,11 +1,12 @@
 var content, position;
 var cmd = {"comm":"", "mode":"", "params":""};
 var user;
+var writeData = [];
 var pre = 1, appendMode = 0;
 var prompt = $('#prompt_blink');
 var before = $('#before');
 var after = $('#after');
-var t,pause,wait=0;
+var t, pause, wait=0;
 var credentials = [];
 
 function blink()
@@ -37,27 +38,29 @@ function welcome() {
 function next_line()
 {
 	var line = $("#clipboard").val();
-	var old_line = "<div class='line'><span class='prompt'>" + user + " </span><span>" + line + "</span></div>";
-	var ind = line.indexOf(" ");
-	cmd["comm"] = "";
-	cmd["mode"] = "";
-	cmd["params"] = "";
-	if(ind + 1) {
-		cmd["comm"] = line.substring(0, ind);
-		cmd["comm"] = $.trim(cmd["comm"]);
-		line = line.substring(ind + 1);
-		ind = line.indexOf(" ");
+	if(appendMode == 0) {
+		var old_line = "<div class='line'><span class='prompt'>" + user + " </span><span>" + line + "</span></div>";
+		var ind = line.indexOf(" ");
+		cmd["comm"] = "";
+		cmd["mode"] = "";
+		cmd["params"] = "";
 		if(ind + 1) {
-			cmd["mode"] = line.substring(0, ind);
+			cmd["comm"] = line.substring(0, ind);
+			cmd["comm"] = $.trim(cmd["comm"]);
 			line = line.substring(ind + 1);
-			cmd["mode"] = $.trim(cmd["mode"]);
+			ind = line.indexOf(" ");
+			if(ind + 1) {
+				cmd["mode"] = line.substring(0, ind);
+				line = line.substring(ind + 1);
+				cmd["mode"] = $.trim(cmd["mode"]);
+			}
+			cmd["params"] = $.trim(line);
+		} else {
+			cmd["comm"] = $.trim(line);
 		}
-		cmd["params"] = $.trim(line);
 	} else {
-		cmd["comm"] = $.trim(line);
+		old_line = "<div class='line'><span class='prompt'>" + line + "</span></div>";
 	}
-	//alert(cmd["comm"]);
-	$('#clipboard').val('');
 	$("#before").html("");
 	$("#after").html("");
 	$("#prompt_blink").html("");
@@ -148,34 +151,41 @@ $(document).ready(function() {
 		alert("cd called");
 	}
 
-	function cat(fs, fileName, mode) {
-		//alert("cat called");
+	function cat(fileName, mode) {
 			if(fileName)
 			{
 				if(mode == ">>")
 				{
 					//alert("cat in write mode");
-					fs.root.getFile(fileName, {create: true, exclusive: false}, function(fileEntry) {
-						fileEntry.createWriter(function(fileWriter) {
-							fileWriter.onwriteend = function(e) {
-								console.log("Write Completed!");
-							};
-							fileWriter.onerror = function(e) {
-								console.log("Write failed: " + e.toString());
-							};
-							/* Data to be written goes here! */
-			
-						}, errorHandler);
-					}, errorHandler);
+					appendMode = 1;
 				}
 				else {
 					alert("cat in read mode");
-						/* Read mode of the cat command */
+					/* Read mode of the cat command */
 				}
 			} else {
 				var old_line = "<div class='line'><span class='prompt'>File name not specified!</span></div>";
 				$('div.line1').before(old_line);
 			}
+	}
+
+	function catWrite(fs, fileName, data) {
+		fs.root.getFile(fileName, {create: true, exclusive: false}, function(fileEntry) {
+			fileEntry.createWriter(function(fileWriter) {
+				fileWriter.onwriteend = function(e) {
+					console.log("Write Completed!");
+				};
+				fileWriter.onerror = function(e) {
+					console.log("Write failed: " + e.toString());
+				};
+				fileWriter.seek(fileWriter.length);
+				/* Data to be written goes here! */
+				var blob = new Blob(data, {type: 'text/plain'});
+				fileWriter.write(blob);
+			
+			}, errorHandler);
+		}, errorHandler);
+		appendMode = 0;
 	}
 
 	function rm(fs, fileName) {
@@ -199,7 +209,7 @@ $(document).ready(function() {
 				cd(fs, cmd["params"]);
 			break;
 			case "cat":
-				cat(fs, cmd["params"], cmd["mode"]);
+				cat(cmd["params"], cmd["mode"]);
 			break;
 			case "rm":
 				rm(fs, cmd["params"]);
@@ -220,7 +230,16 @@ $(document).ready(function() {
 		$("#clipboard").keydown(function() {
 			if(event.which == 13 && pre == 0) {
 				next_line();
-				command(fs, cmd);
+				if(appendMode == 0) {
+					command(fs, cmd);
+				} else {
+					var lineData = $.trim($(this).val());
+					writeData.push(lineData);
+					if(lineData == "!" ) {
+						catWrite(fs, cmd["params"], writeData);
+					}
+				}
+				$(this).val("");
 			}
 		});
 
