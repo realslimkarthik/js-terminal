@@ -151,17 +151,29 @@ $(document).ready(function() {
 		alert("cd called");
 	}
 
-	function cat(fileName, mode) {
+	function cat(fs, fileName, mode) {
 			if(fileName)
 			{
 				if(mode == ">>")
 				{
 					//alert("cat in write mode");
 					appendMode = 1;
+					$("#username").html("");
 				}
 				else {
-					alert("cat in read mode");
-					/* Read mode of the cat command */
+					//alert("cat in read mode");
+					fs.root.getFile(fileName, {}, function(fileEntry) {
+						fileEntry.file(function(file) {
+							var reader = new FileReader();
+
+							reader.onloadend = function(e) {
+								var readData = this.result;
+								alert(readData);
+							};
+
+							reader.readAsText(file);
+						}, errorHandler);
+					}, errorHandler);
 				}
 			} else {
 				var old_line = "<div class='line'><span class='prompt'>File name not specified!</span></div>";
@@ -209,7 +221,7 @@ $(document).ready(function() {
 				cd(fs, cmd["params"]);
 			break;
 			case "cat":
-				cat(cmd["params"], cmd["mode"]);
+				cat(fs, cmd["params"], cmd["mode"]);
 			break;
 			case "rm":
 				rm(fs, cmd["params"]);
@@ -234,10 +246,12 @@ $(document).ready(function() {
 					command(fs, cmd);
 				} else {
 					var lineData = $.trim($(this).val());
-					writeData.push(lineData);
 					if(lineData == "!" ) {
 						catWrite(fs, cmd["params"], writeData);
+						$("#username").html(user);
 					}
+					else
+						writeData.push(lineData + "\n");
 				}
 				$(this).val("");
 			}
