@@ -156,19 +156,19 @@ $(document).ready(function() {
 			{
 				if(mode == ">>")
 				{
-					//alert("cat in write mode");
 					appendMode = 1;
 					$("#username").html("");
 				}
 				else {
-					//alert("cat in read mode");
+					var readData;
 					fs.root.getFile(fileName, {}, function(fileEntry) {
 						fileEntry.file(function(file) {
 							var reader = new FileReader();
 
 							reader.onloadend = function(e) {
-								var readData = this.result;
-								alert(readData);
+								readData = this.result;
+								readData = readData.replace(/\n/g, "<br>");
+								$("div.line1").before(readData);
 							};
 
 							reader.readAsText(file);
@@ -256,37 +256,6 @@ $(document).ready(function() {
 				$(this).val("");
 			}
 		});
-
-		/*fs.root.getFile("log.txt", {create: true, exclusive: false}, function(fileEntry) {
-
-			fileEntry.createWriter(function(fileWriter) {
-				fileWriter.onwriteend = function(e) {
-					console.log("Write Completed!");
-				};
-				fileWriter.onerror = function(e) {
-					console.log("Write failed: " + e.toString());
-				};
-
-				var blob = new Blob(['Lorem Ipsum'], {type: 'text/plain'});
-
-				fileWriter.write(blob);
-			}, errorHandler);
-
-			fileEntry.file(function(file) {
-				var reader = new FileReader();
-
-				reader.onloadend = function(e) {
-					var txtArea = document.createElement("textarea");
-					txtArea.value = this.result;
-					alert(this.result);
-					document.body.appendChild(txtArea);
-					console.log("read completed!");
-				};
-
-				reader.readAsText(file);
-			}, errorHandler);
-		}, errorHandler);
-	//*/
 
   		console.log('Opened file system: ' + fs.name);
 	}
