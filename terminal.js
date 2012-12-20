@@ -168,6 +168,7 @@ $(document).ready(function() {
 							reader.onloadend = function(e) {
 								readData = this.result;
 								readData = readData.replace(/\n/g, "<br>");
+								readData = "<span style='color:#22FF08;'>" + readData + "</span>"
 								$("div.line1").before(readData);
 							};
 
@@ -191,7 +192,6 @@ $(document).ready(function() {
 					console.log("Write failed: " + e.toString());
 				};
 				fileWriter.seek(fileWriter.length);
-				/* Data to be written goes here! */
 				var blob = new Blob(data, {type: 'text/plain'});
 				fileWriter.write(blob);
 			
@@ -231,6 +231,8 @@ $(document).ready(function() {
 			break;
 			case "rmdir":
 				rmdir(fs, cmd["params"]);
+			break;
+			case "":
 			break;
 			default:
 				alert("Invalid Command name");
