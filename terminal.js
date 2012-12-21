@@ -144,7 +144,7 @@ $(document).ready(function() {
     		}, errorHandler);
 		};
 		readEntries();
-		alert(entries);
+		//alert(entries);
 	}
 
 	function cd(fs, dirName) {
@@ -235,7 +235,8 @@ $(document).ready(function() {
 			case "":
 			break;
 			default:
-				alert("Invalid Command name");
+				var old_line = "<div class='line'><span class='prompt'>" + cmd["comm"] + ": command not found" + "</span></div>";
+				$("div.line1").before(old_line);
 		}
 	}
 
