@@ -3,7 +3,6 @@
 <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="bootstrap-responsive.min.css">
 <!--<link href='http://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'>-->
-<link href='http://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'>
 <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
 <style type="text/css">
 body
@@ -22,6 +21,7 @@ width:100%;
 font-family:Inconsolata;
 font-size:15px;
 padding:10px;
+overflow: auto;
 background:black;
 height:80%;
 }
@@ -51,7 +51,7 @@ height:18px;
 {
 color:#22FF08;width:100%;height:18px;padding:0;margin:0;
 }
-.line1
+#line1
 {
 width:100%;height:18px;padding:0;margin:0;
 }
@@ -67,7 +67,7 @@ width:100%;height:18px;padding:0;margin:0;
 
 <div class="row">
 <div id="terminal" class="offset1 span12">
-<div class="line1"><span id="username"></span><span id="before"></span><span id="prompt_blink" class="vis"></span><span id="after"></span></div>
+<div id="line1"><span id="username"></span><span id="before"></span><span id="prompt_blink" class="vis"></span><span id="after"></span></div>
 </div>
 </div>
 <textarea id="clipboard"></textarea>

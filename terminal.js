@@ -31,7 +31,7 @@ function welcome() {
 	$('#after').css('color', '#22FF08');
 	var old_line = "<div class='line'><span class='prompt'>Welcome " + $('#clipboard').val(); + "</span></div>";
 	$('#clipboard').val('');
-	$('div.line1').before(old_line);
+	$('div#line1').before(old_line);
 	pre = 0;
 }
 
@@ -64,7 +64,7 @@ function next_line()
 	$("#before").html("");
 	$("#after").html("");
 	$("#prompt_blink").html("");
-	$('div.line1').before(old_line);
+	$('div#line1').before(old_line);
 }
 
 function get_data()
@@ -80,7 +80,7 @@ function get_data()
 }
 
 $(document).ready(function() {
-	$('div.line1').before("<div class='line'><span>Enter your Username:</span></div><br>");
+	$('div#line1').before("<div class='line'><span>Enter your Username:</span></div><br>");
 	$('#clipboard').focus();
 	$('#username').html('Username:');
 	get_data();
@@ -171,7 +171,7 @@ $(document).ready(function() {
 								readData = this.result;
 								readData = readData.replace(/\n/g, "<br>");
 								readData = "<span style='color:#22FF08;'>" + readData + "</span>"
-								$("div.line1").before(readData);
+								$("div#line1").before(readData);
 							};
 
 							reader.readAsText(file);
@@ -180,7 +180,7 @@ $(document).ready(function() {
 				}
 			} else {
 				var old_line = "<div class='line'><span class='prompt'>File name not specified!</span></div>";
-				$('div.line1').before(old_line);
+				$('div#line1').before(old_line);
 			}
 	}
 
@@ -242,8 +242,9 @@ $(document).ready(function() {
 			break;
 			default:
 				var old_line = "<div class='line'><span class='prompt'>" + cmd["comm"] + ": command not found" + "</span></div>";
-				$("div.line1").before(old_line);
+				$("div#line1").before(old_line);
 		}
+		$("div#terminal").scrollTop(1e4);
 	}
 
 	function onInitFs(fs) {
@@ -252,7 +253,9 @@ $(document).ready(function() {
 			if(event.which == 13 && pre == 0) {
 				next_line();
 				if(appendMode == 0) {
-					command(fs, cmd);
+					fs.root.getDirectory("js_terminal", {create: true}, function(dirEntry){
+						command(fs, cmd);
+					}, errorHandler);
 				} else {
 					var lineData = $.trim($(this).val());
 					if(lineData == "!" ) {
@@ -283,7 +286,7 @@ $(document).ready(function() {
 		    case FileError.NOT_FOUND_ERR:
 		      msg = 'NOT_FOUND_ERR';
 		      old_line = "<span class='prompt'>" + cmd["comm"] + ": " + cmd["params"] + ": No such file or directory</span><br>";
-		      $("div.line1").before(old_line);
+		      $("div#line1").before(old_line);
 		      break;
 		    case FileError.SECURITY_ERR:
 		      msg = 'SECURITY_ERR';
@@ -299,6 +302,7 @@ $(document).ready(function() {
 		      break;
 		  };
 		console.log('Error: ' + msg);
+		$("div#terminal").scrollTop(1e4);
 	}
 
 
