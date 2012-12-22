@@ -136,9 +136,11 @@ $(document).ready(function() {
 		var readEntries = function() {
 			dirReader.readEntries(function(results) {
 				if (!results.length) {
-        			listResults(entries.sort());
+        			//listResults(entries.sort());
+        			return;
       			} else {
-        			entries = entries.concat(toArray(results));
+        			//entries = entries.concat(toArray(results));
+        			entries.push(results);
         			readEntries();
       			}
     		}, errorHandler);
@@ -173,8 +175,8 @@ $(document).ready(function() {
 							};
 
 							reader.readAsText(file);
-						}, errorHandler);
-					}, errorHandler);
+						}, catRmErrorHandler);
+					}, catRmErrorHandler);
 				}
 			} else {
 				var old_line = "<div class='line'><span class='prompt'>File name not specified!</span></div>";
@@ -201,7 +203,11 @@ $(document).ready(function() {
 	}
 
 	function rm(fs, fileName) {
-		alert("rm called");
+		fs.root.getFile(fileName, {create: false}, function(fileEntry) {
+			fileEntry.remove(function() {
+				console.log(fileName + " removed.");
+			}, catRmErrorHandler);
+		}, catRmErrorHandler);
 	}
 
 	function mkdir(fs, dirName) {
@@ -262,9 +268,43 @@ $(document).ready(function() {
 
   		console.log('Opened file system: ' + fs.name);
 	}
+
+
+///////////////////////////////***** Error Handlers *****///////////////////////////////
+
+
+	function catRmErrorHandler(e) {
+		var msg = '';
+		var old_line;
+		  switch (e.code) {
+		    case FileError.QUOTA_EXCEEDED_ERR:
+		      msg = 'QUOTA_EXCEEDED_ERR';
+		      break;
+		    case FileError.NOT_FOUND_ERR:
+		      msg = 'NOT_FOUND_ERR';
+		      old_line = "<span class='prompt'>" + cmd["comm"] + ": " + cmd["params"] + ": No such file or directory</span><br>";
+		      $("div.line1").before(old_line);
+		      break;
+		    case FileError.SECURITY_ERR:
+		      msg = 'SECURITY_ERR';
+		      break;
+		    case FileError.INVALID_MODIFICATION_ERR:
+		      msg = 'INVALID_MODIFICATION_ERR';
+		      break;
+		    case FileError.INVALID_STATE_ERR:
+		      msg = 'INVALID_STATE_ERR';
+		      break;
+		    default:
+		      msg = 'Unknown Error';
+		      break;
+		  };
+		console.log('Error: ' + msg);
+	}
+
+
 	function errorHandler(e) {
   		var msg = '';
-		  switch (e.code) {
+		switch (e.code) {
 		    case FileError.QUOTA_EXCEEDED_ERR:
 		      msg = 'QUOTA_EXCEEDED_ERR';
 		      break;
@@ -283,9 +323,14 @@ $(document).ready(function() {
 		    default:
 		      msg = 'Unknown Error';
 		      break;
-  };
-  console.log('Error: ' + msg);
-}
+		};
+  		console.log('Error: ' + msg);
+	}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+
 	window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
 	window.requestFileSystem(window.TEMPORARY, 5*1024*1024 /*5MB*/, onInitFs, errorHandler);
 });
