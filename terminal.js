@@ -129,24 +129,31 @@ $(document).ready(function() {
 		$('#prompt_blink').css('width','auto');
 	});
 
-	function ls(fs) {
-		alert("ls called");
-		var dirReader = fs.root.createReader();
-		var entries = [];
-		var readEntries = function() {
-			dirReader.readEntries(function(results) {
-				if (!results.length) {
-        			//listResults(entries.sort());
-        			return;
-      			} else {
-        			//entries = entries.concat(toArray(results));
-        			entries.push(results);
-        			readEntries();
-      			}
-    		}, errorHandler);
+	function toArray(list) {
+		return Array.prototype.slice.call(list || [], 0);
+	}
+
+	function ls(fs, callBack) {
+	    if (!fs) {
+	      return;
+	    }
+
+	    var entries = [];
+	    var reader = fs.root.createReader();
+
+	    var readEntries = function() {
+	      reader.readEntries(function(results) {
+	        if (!results.length) {
+	          entries = entries.sort();
+	          callBack(entries);
+	        } else {
+	          entries = entries.concat(toArray(results));
+	          readEntries();
+	        }
+	      }, errorHandler);
 		};
-		readEntries();
-		//alert(entries);
+
+	    readEntries();
 	}
 
 	function cd(fs, dirName) {
@@ -221,7 +228,17 @@ $(document).ready(function() {
 	function command(fs, cmd) {
 		switch(cmd["comm"]) {
 			case "ls":
-				ls(fs);
+				ls(fs, function(entries) {
+					var ent = "";
+					entries.forEach(function(entry){
+						if(entry.isDirectory)
+							ent += "<span><b>" + entry.name + "</b></span><br/>";
+						else
+							ent += "<span>" + entry.name + "</span><br/>";
+					});
+					var res = "<div class='res'>" + ent + "</div><br/>"
+					$("div#line1").before(res);
+				});
 			break;
 			case "cd":
 				cd(fs, cmd["params"]);
@@ -253,7 +270,7 @@ $(document).ready(function() {
 			if(event.which == 13 && pre == 0) {
 				next_line();
 				if(appendMode == 0) {
-					fs.root.getDirectory("js_terminal", {create: true}, function(dirEntry){
+					fs.root.getDirectory("js_terminal", {create: true}, function(dirEntry) {
 						command(fs, cmd);
 					}, errorHandler);
 				} else {
