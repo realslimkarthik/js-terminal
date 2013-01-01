@@ -233,17 +233,24 @@ $(document).ready(function() {
 	}
 
 	function mkdir(fs, dirName) {
-		alert("mkdir called");
 		var path = dirName.split('/');
-		fs.root.getDirectory(dirName, {create: true}, function(dirEntry) {
+		fs.root.getDirectory(dirName, {create: true, exclusive: true}, function(dirEntry) {
 			if(path.length == 1)
-				createDir(dirEntry, path[0]);
+				console.log(dirEntry.name + " created");
 
-		}, errorHandler);
+		}, catRmErrorHandler);
 	}
 
 	function rmdir(fs, dirName) {
-		alert("rmdir called");
+		var path = dirName.split('/');
+		fs.root.getDirectory(dirName, {create: false}, function(dirEntry) {
+			if(path.length == 1)
+			{
+				dirEntry.remove(function() {
+					console.log(dirEntry.name + " has been removed");
+				}, catRmErrorHandler);
+			}
+		}, catRmErrorHandler);
 	}
 
 	function command(fs, cmd) {
@@ -311,7 +318,7 @@ $(document).ready(function() {
 		      break;
 		    case FileError.NOT_FOUND_ERR:
 		      msg = 'NOT_FOUND_ERR';
-		      old_line = "<span class='prompt'>" + cmd["comm"] + ": " + cmd["params"] + ": No such file or directory</span><br>";
+		      old_line = "<span class='prompt'>" + cmd["comm"] + ": " + cmd["params"] + ": No such file or directory found in current directory</span><br>";
 		      $("div#line1").before(old_line);
 		      break;
 		    case FileError.SECURITY_ERR:
@@ -319,6 +326,11 @@ $(document).ready(function() {
 		      break;
 		    case FileError.INVALID_MODIFICATION_ERR:
 		      msg = 'INVALID_MODIFICATION_ERR';
+		      if(cmd["params"].indexOf(".") + 1)
+		      	old_line = "<span class='prompt'>" + cmd["comm"] + ": cannot create directory " + cmd["params"] + ": File Exists</span><br>";
+		      else
+		      	old_line = "<span class='prompt'>" + cmd["comm"] + ": cannot create directory " + cmd["params"] + ": Directory Exists</span><br>";
+		      $("div#line1").before(old_line);
 		      break;
 		    case FileError.INVALID_STATE_ERR:
 		      msg = 'INVALID_STATE_ERR';
