@@ -8,6 +8,7 @@ var before = $('#before');
 var after = $('#after');
 var t, pause, wait=0;
 var credentials = [];
+var current = "/";
 
 function blink()
 {
@@ -137,7 +138,6 @@ $(document).ready(function() {
 	    if (!fs) {
 	      return;
 	    }
-
 	    var entries = [];
 	    var reader = fs.root.createReader();
 
@@ -154,6 +154,21 @@ $(document).ready(function() {
 		};
 
 	    readEntries();
+	}
+
+	function ls_callBack(entries) {
+		var ent = "";
+		if(entries.length != 0) {
+			entries.forEach(function(entry){
+				if(entry.isDirectory)
+					ent += "<span><b style='color:#95D4F0;'>" + entry.name + "</b></span><br/>";
+				else
+					ent += "<span>" + entry.name + "</span><br/>";
+			});
+			var res = "<div class='res'>" + ent + "</div>"
+		} else
+			var res = "";
+		$("div#line1").before(res);
 	}
 
 	function cd(fs, dirName) {
@@ -219,6 +234,11 @@ $(document).ready(function() {
 
 	function mkdir(fs, dirName) {
 		alert("mkdir called");
+		var path = dirName.split('/');
+		fs.root.getDirectory(dirName, {create: true}, function(dirEntry) {
+			if(path[0])
+
+		}, errorHandler);
 	}
 
 	function rmdir(fs, dirName) {
@@ -228,17 +248,7 @@ $(document).ready(function() {
 	function command(fs, cmd) {
 		switch(cmd["comm"]) {
 			case "ls":
-				ls(fs, function(entries) {
-					var ent = "";
-					entries.forEach(function(entry){
-						if(entry.isDirectory)
-							ent += "<span><b>" + entry.name + "</b></span><br/>";
-						else
-							ent += "<span>" + entry.name + "</span><br/>";
-					});
-					var res = "<div class='res'>" + ent + "</div><br/>"
-					$("div#line1").before(res);
-				});
+				ls(fs, ls_callBack);
 			break;
 			case "cd":
 				cd(fs, cmd["params"]);
@@ -261,7 +271,7 @@ $(document).ready(function() {
 				var old_line = "<div class='line'><span class='prompt'>" + cmd["comm"] + ": command not found" + "</span></div>";
 				$("div#line1").before(old_line);
 		}
-		$("div#terminal").scrollTop(1e4);
+		$(document).scrollTop(1e4);
 	}
 
 	function onInitFs(fs) {
@@ -270,9 +280,7 @@ $(document).ready(function() {
 			if(event.which == 13 && pre == 0) {
 				next_line();
 				if(appendMode == 0) {
-					fs.root.getDirectory("js_terminal", {create: true}, function(dirEntry) {
 						command(fs, cmd);
-					}, errorHandler);
 				} else {
 					var lineData = $.trim($(this).val());
 					if(lineData == "!" ) {
@@ -319,7 +327,6 @@ $(document).ready(function() {
 		      break;
 		  };
 		console.log('Error: ' + msg);
-		$("div#terminal").scrollTop(1e4);
 	}
 
 
