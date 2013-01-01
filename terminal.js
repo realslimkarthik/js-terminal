@@ -236,7 +236,8 @@ $(document).ready(function() {
 		alert("mkdir called");
 		var path = dirName.split('/');
 		fs.root.getDirectory(dirName, {create: true}, function(dirEntry) {
-			if(path[0])
+			if(path.length == 1)
+				createDir(dirEntry, path[0]);
 
 		}, errorHandler);
 	}
