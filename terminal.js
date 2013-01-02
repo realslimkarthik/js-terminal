@@ -172,7 +172,16 @@ $(document).ready(function() {
 	}
 
 	function cd(fs, dirName) {
-		alert("cd called");
+		//alert("cd called");
+		if(dirName == "..") {
+			var pos = current.lastIndexOf("/");
+			current = current.substr(0, pos) + "/";
+		}
+		else {
+			fs.root.getDirectory(dirName, {}, function(dirEntry) {
+				current = dirEntry.fullPath + "/";
+			}, catRmErrorHandler);
+		}
 	}
 
 	function cat(fs, fileName, mode) {
@@ -185,7 +194,7 @@ $(document).ready(function() {
 				}
 				else {
 					var readData;
-					fs.root.getFile(fileName, {}, function(fileEntry) {
+					fs.root.getFile(current + fileName, {}, function(fileEntry) {
 						fileEntry.file(function(file) {
 							var reader = new FileReader();
 
@@ -207,7 +216,7 @@ $(document).ready(function() {
 	}
 
 	function catWrite(fs, fileName, data) {
-		fs.root.getFile(fileName, {create: true, exclusive: false}, function(fileEntry) {
+		fs.root.getFile(current + fileName, {create: true, exclusive: false}, function(fileEntry) {
 			fileEntry.createWriter(function(fileWriter) {
 				fileWriter.onwriteend = function(e) {
 					console.log("Write Completed!");
@@ -225,7 +234,7 @@ $(document).ready(function() {
 	}
 
 	function rm(fs, fileName) {
-		fs.root.getFile(fileName, {create: false}, function(fileEntry) {
+		fs.root.getFile(current + fileName, {create: false}, function(fileEntry) {
 			fileEntry.remove(function() {
 				console.log(fileName + " removed.");
 			}, catRmErrorHandler);
@@ -327,7 +336,7 @@ $(document).ready(function() {
 		    case FileError.INVALID_MODIFICATION_ERR:
 		      msg = 'INVALID_MODIFICATION_ERR';
 		      if(cmd["params"].indexOf(".") + 1)
-		      	old_line = "<span class='prompt'>" + cmd["comm"] + ": cannot create directory " + cmd["params"] + ": File Exists</span><br>";
+		      	old_line = "<span addClasss='prompt'>" + cmd["comm"] + ": cannot create directory " + cmd["params"] + ": File Exists</span><br>";
 		      else
 		      	old_line = "<span class='prompt'>" + cmd["comm"] + ": cannot create directory " + cmd["params"] + ": Directory Exists</span><br>";
 		      $("div#line1").before(old_line);
