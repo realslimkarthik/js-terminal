@@ -178,6 +178,8 @@ $(document).ready(function() {
 			var pos = current.lastIndexOf("/");
 			current = current.substr(0, pos) + "/";
 		}
+		else if(dirName == "/")
+			current = "/";
 		else {
 			fs.root.getDirectory(dirName, {}, function(dirEntry) {
 				current = dirEntry.fullPath + "/";
@@ -195,7 +197,9 @@ $(document).ready(function() {
 				}
 				else {
 					var readData;
-					fs.root.getFile(current + fileName, {}, function(fileEntry) {
+					if(fileName.charAt(0) != "/")
+						fileName = current + fileName;
+					fs.root.getFile(fileName, {}, function(fileEntry) {
 						fileEntry.file(function(file) {
 							var reader = new FileReader();
 
@@ -217,7 +221,9 @@ $(document).ready(function() {
 	}
 
 	function catWrite(fs, fileName, data) {
-		fs.root.getFile(current + fileName, {create: true, exclusive: false}, function(fileEntry) {
+		if(fileName.charAt(0) != "/")
+			fileName = current + fileName;
+		fs.root.getFile(fileName, {create: true, exclusive: false}, function(fileEntry) {
 			fileEntry.createWriter(function(fileWriter) {
 				fileWriter.onwriteend = function(e) {
 					console.log("Write Completed!");
@@ -235,7 +241,9 @@ $(document).ready(function() {
 	}
 
 	function rm(fs, fileName) {
-		fs.root.getFile(current + fileName, {create: false}, function(fileEntry) {
+		if(fileName.charAt(0) != "/")
+			fileName = current + fileName;
+		fs.root.getFile(fileName, {create: false}, function(fileEntry) {
 			fileEntry.remove(function() {
 				console.log(fileName + " removed.");
 			}, catRmErrorHandler);
