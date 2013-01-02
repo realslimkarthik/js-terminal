@@ -139,21 +139,23 @@ $(document).ready(function() {
 	      return;
 	    }
 	    var entries = [];
-	    var reader = fs.root.createReader();
+	    fs.root.getDirectory(current, {}, function(dirEntry) {
+		    var reader = dirEntry.createReader();
 
-	    var readEntries = function() {
-	      reader.readEntries(function(results) {
-	        if (!results.length) {
-	          entries = entries.sort();
-	          callBack(entries);
-	        } else {
-	          entries = entries.concat(toArray(results));
-	          readEntries();
-	        }
-	      }, errorHandler);
-		};
+		    var readEntries = function() {
+		      reader.readEntries(function(results) {
+		        if (!results.length) {
+		          entries = entries.sort();
+		          callBack(entries);
+		        } else {
+		          entries = entries.concat(toArray(results));
+		          readEntries();
+		        }
+		      }, errorHandler);
+			};
 
-	    readEntries();
+		    readEntries();
+		}, errorHandler);
 	}
 
 	function ls_callBack(entries) {
@@ -172,7 +174,6 @@ $(document).ready(function() {
 	}
 
 	function cd(fs, dirName) {
-		//alert("cd called");
 		if(dirName == "..") {
 			var pos = current.lastIndexOf("/");
 			current = current.substr(0, pos) + "/";
@@ -281,6 +282,9 @@ $(document).ready(function() {
 			break;
 			case "rmdir":
 				rmdir(fs, cmd["params"]);
+			break;
+			case "exit":
+				window.close();
 			break;
 			case "":
 			break;
