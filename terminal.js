@@ -128,6 +128,8 @@ $(document).ready(function() {
 		$('#prompt_blink').css('width','8px');
 	else
 		$('#prompt_blink').css('width','auto');
+    if(event.which=32)
+      $(this).val() = $(this).val().(" ", "&nbsp");
 	});
 
 	function toArray(list) {
