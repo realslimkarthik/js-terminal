@@ -9,6 +9,7 @@ var after = $('#after');
 var t, pause, wait=0;
 var credentials = [];
 var current = "/";
+var cmdList = ["ls", "cd", "cat", "rm", "mkdir", "rmdir", "exit"];
 
 function blink()
 {
@@ -21,6 +22,7 @@ function blink()
 
 function build_command(content,position)
 {
+	content = content.replace(" ", "&nbsp;");
 	$('#before').html(content.substr(0,position));
 	$('#after').html(content.substr(position+1,content.length-1));
 	$('#prompt_blink').html(content.charAt(position));
@@ -80,9 +82,21 @@ function get_data()
 	});
 }
 
+function autoComplete(command) {
+	if(!(command.indexOf(" ") + 1)) {
+		if(command.charAt(0) == "l")
+			$("#clipboard").val("ls ");
+		else if(command.match(/^e[xi]{2}/))
+			$("#clipboard").val("exit ");
+		else if(command.match(/^m[kdi]{0}/))
+			$("#clipboard").val("mkdir ");
+		else if(command.match(/^rmd[i]{0}/))
+			$("#clipboard").val("rmdir ");
+	}
+}
+
 $(document).ready(function() {
 	$('div#line1').before("<div class='line'><span>Enter your Username:</span></div><br>");
-	$('#clipboard').focus();
 	$('#username').html('Username:');
 	get_data();
 	$('#terminal').click(function() {
@@ -90,8 +104,12 @@ $(document).ready(function() {
 		blink();
 	});
 
-	$('#clipboard').keydown(function() {
+	$('#clipboard').keydown(function(e) {
 	content = $(this).val();
+	if(event.which == 9 || event.keyCode == 9)
+	{
+		e.preventDefault();
+	}
 	clearTimeout(t);
 	clearTimeout(pause);
 	wait = 1;
@@ -101,35 +119,38 @@ $(document).ready(function() {
 			build_command(content,position);
 		else
 		{
-			$('#before').html(content);
+			$('#before').html(content.replace(" ", "&nbsp;"));
 			$('#prompt_blink').html('');
 			$('#after').html('');
-		}	
+		}
 	});
 
-	$('#clipboard').keyup(function() {
-	content = $(this).val();
-	if(wait==1)
-	{
-		wait = 0;
-		pause = setTimeout("blink()",700);
+	$('#clipboard').keyup(function(e) {
+      if(event.which == 9 || event.keyCode == 9)
+		{
+			e.preventDefault();
+			autoComplete($(this).val());
+		}
+      content = $(this).val();
+		if(wait==1)
+		{
+			wait = 0;
+			pause = setTimeout("blink()",700);
 
-	}
+		}
 		var position = $('#clipboard').prop("selectionStart");
 		if(position<=content.length-1)
 			build_command(content,position);
 		else
 		{
-			$('#before').html(content);
+			$('#before').html(content.replace(" ", "&nbsp;"));
 			$('#prompt_blink').html('');
 			$('#after').html('');
 		}
-	if($('#prompt_blink').html()=='')
-		$('#prompt_blink').css('width','8px');
-	else
-		$('#prompt_blink').css('width','auto');
-    if(event.which=32)
-      $(this).val() = $(this).val().(" ", "&nbsp");
+		if($('#prompt_blink').html()=='')
+			$('#prompt_blink').css('width','8px');
+		else
+			$('#prompt_blink').css('width','auto');
 	});
 
 	function toArray(list) {
@@ -183,8 +204,8 @@ $(document).ready(function() {
 		else if(dirName == "/")
 			current = "/";
 		else {
-			fs.root.getDirectory(dirName, {}, function(dirEntry) {
-				current = dirEntry.fullPath + "/";
+			fs.root.getDirectory(dirName + "/", {}, function(dirEntry) {
+				current = dirEntry.fullPath;
 			}, catRmErrorHandler);
 		}
 	}
@@ -349,11 +370,18 @@ $(document).ready(function() {
 		      break;
 		    case FileError.INVALID_MODIFICATION_ERR:
 		      msg = 'INVALID_MODIFICATION_ERR';
-		      if(cmd["params"].indexOf(".") + 1)
-		      	old_line = "<span addClasss='prompt'>" + cmd["comm"] + ": cannot create directory " + cmd["params"] + ": File Exists</span><br>";
-		      else
-		      	old_line = "<span class='prompt'>" + cmd["comm"] + ": cannot create directory " + cmd["params"] + ": Directory Exists</span><br>";
-		      $("div#line1").before(old_line);
+			      if(cmd["comm"] == "mkdir")
+			      {
+			      	if(cmd["params"].indexOf(".") + 1)
+			      		old_line = "<span class='prompt'>" + cmd["comm"] + ": cannot create directory " + cmd["params"] + ": File Exists</span><br>";
+			      	else
+			      	   	old_line = "<span class='prompt'>" + cmd["comm"] + ": cannot create directory " + cmd["params"] + ": Directory Exists</span><br>";
+			      }
+			      else if(cmd["comm"] == "rmdir")
+			      {
+			      	old_line = "<span class='prompt'>" + cmd["comm"] + ": failed to remove directory '" + cmd["params"] + "/': Directory not empty</span><br>";
+			      }
+			      $("div#line1").before(old_line);
 		      break;
 		    case FileError.INVALID_STATE_ERR:
 		      msg = 'INVALID_STATE_ERR';
