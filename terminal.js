@@ -10,6 +10,7 @@ var t, pause, wait=0;
 var credentials = [];
 var current = "/";
 var cmdList = ["ls", "cd", "cat", "rm", "mkdir", "rmdir", "exit"];
+var possibilities = [];
 
 function blink()
 {
@@ -83,6 +84,7 @@ function get_data()
 }
 
 function autoComplete(command) {
+	possibilities = [];
 	if(!(command.indexOf(" ") + 1)) {
 		if(command.charAt(0) == "l")
 			$("#clipboard").val("ls ");
@@ -92,6 +94,11 @@ function autoComplete(command) {
 			$("#clipboard").val("mkdir ");
 		else if(command.match(/^rmd[i]{0}/))
 			$("#clipboard").val("rmdir ");
+		else if(command.match(/^r[m]{0}/))
+		{
+			possibilities.push("rm");
+			possibilities.push("rmdir");
+		}
 	}
 }
 
@@ -119,7 +126,7 @@ $(document).ready(function() {
 			build_command(content,position);
 		else
 		{
-			$('#before').html(content.replace(" ", "&nbsp;"));
+			$('#before').html(content.replace(/ /g, "&nbsp;"));
 			$('#prompt_blink').html('');
 			$('#after').html('');
 		}
@@ -130,6 +137,13 @@ $(document).ready(function() {
 		{
 			e.preventDefault();
 			autoComplete($(this).val());
+			if(possibilities.length != 0) {
+				var outPut = "";
+				possibilities.forEach(function(entry) {
+					outPut += entry + "                                             ";
+				});
+				$(this).val($.trim(outPut));
+			}
 		}
       content = $(this).val();
 		if(wait==1)
@@ -143,7 +157,7 @@ $(document).ready(function() {
 			build_command(content,position);
 		else
 		{
-			$('#before').html(content.replace(" ", "&nbsp;"));
+			$('#before').html(content.replace(/ /g, "&nbsp;"));
 			$('#prompt_blink').html('');
 			$('#after').html('');
 		}
