@@ -39,11 +39,12 @@ function welcome() {
 	pre = 0;
 }
 
-function next_line()
+function next_line(line)
 {
-	var line = $("#clipboard").val();
+	//var line = $("#clipboard").val();
+	var modLine = line.replace(/ /g, "&nbsp");
 	if(appendMode == 0) {
-		var old_line = "<div class='line'><span class='prompt'>" + user + " </span><span>" + line + "</span></div>";
+		var old_line = "<div class='line'><span class='prompt'>" + user + " </span><span>" + modLine + "</span></div>";
 		var ind = line.indexOf(" ");
 		cmd["comm"] = "";
 		cmd["mode"] = "";
@@ -63,7 +64,7 @@ function next_line()
 			cmd["comm"] = $.trim(line);
 		}
 	} else {
-		old_line = "<div class='line'><span class='prompt'>" + line + "</span></div>";
+		old_line = "<div class='line'><span class='prompt'>" + modLine + "</span></div><br>";
 	}
 	$("#before").html("");
 	$("#after").html("");
@@ -94,10 +95,17 @@ function autoComplete(command) {
 			$("#clipboard").val("mkdir ");
 		else if(command.match(/^rmd[i]{0}/))
 			$("#clipboard").val("rmdir ");
+		else if(command.match(/^c[a]{1}/))
+			$("#clipboard").val("cat ");
 		else if(command.match(/^r[m]{0}/))
 		{
 			possibilities.push("rm");
 			possibilities.push("rmdir");
+		}
+		else if(command.match(/^c/) && command.length == 1)
+		{
+			possibilities.push("cd");
+			possibilities.push("cat");
 		}
 	}
 }
@@ -142,7 +150,10 @@ $(document).ready(function() {
 				possibilities.forEach(function(entry) {
 					outPut += entry + "                                             ";
 				});
-				$(this).val($.trim(outPut));
+				outPut = $.trim(outPut);
+				appendMode = 1;
+				next_line(outPut);
+				appendMode = 0;
 			}
 		}
       content = $(this).val();
@@ -344,7 +355,7 @@ $(document).ready(function() {
 		
 		$("#clipboard").keydown(function() {
 			if(event.which == 13 && pre == 0) {
-				next_line();
+				next_line($(this).val());
 				if(appendMode == 0) {
 						command(fs, cmd);
 				} else {
