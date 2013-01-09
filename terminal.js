@@ -41,7 +41,6 @@ function welcome() {
 
 function next_line(line)
 {
-	//var line = $("#clipboard").val();
 	var modLine = line.replace(/ /g, "&nbsp");
 	if(appendMode == 0) {
 		var old_line = "<div class='line'><span class='prompt'>" + user + " </span><span>" + modLine + "</span></div>";
@@ -63,6 +62,10 @@ function next_line(line)
 		} else {
 			cmd["comm"] = $.trim(line);
 		}
+	}
+	else if(appendMode == 2) {
+		old_line = "<div class='line'><span class='prompt'>" + user + "</span><span></span>" + $("#clipboard").val() + "</div>";
+		old_line += "<div class='line'><span class='prompt'>" + modLine + "</span></div><br>";
 	} else {
 		old_line = "<div class='line'><span class='prompt'>" + modLine + "</span></div><br>";
 	}
@@ -89,7 +92,7 @@ function autoComplete(command) {
 	if(!(command.indexOf(" ") + 1)) {
 		if(command.charAt(0) == "l")
 			$("#clipboard").val("ls ");
-		else if(command.match(/^e[xi]{2}/))
+		else if(command.match(/^e[xi]{0}/))
 			$("#clipboard").val("exit ");
 		else if(command.match(/^m[kdi]{0}/))
 			$("#clipboard").val("mkdir ");
@@ -141,7 +144,7 @@ $(document).ready(function() {
 	});
 
 	$('#clipboard').keyup(function(e) {
-      if(event.which == 9 || event.keyCode == 9)
+      if((event.which == 9 || event.keyCode == 9)  && pre == 0)
 		{
 			e.preventDefault();
 			autoComplete($(this).val());
@@ -151,7 +154,7 @@ $(document).ready(function() {
 					outPut += entry + "                                             ";
 				});
 				outPut = $.trim(outPut);
-				appendMode = 1;
+				appendMode = 2;
 				next_line(outPut);
 				appendMode = 0;
 			}
