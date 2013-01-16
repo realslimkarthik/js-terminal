@@ -9,7 +9,7 @@ var after = $('#after');
 var t, pause, wait=0;
 var credentials = [];
 var current = "/";
-var cmdList = ["ls", "cd", "cat", "rm", "mkdir", "rmdir", "exit"];
+var cmdList = ["ls", "cd", "cat", "rm", "mkdir", "rmdir", "pwd", "exit"];
 var possibilities = [];
 
 function blink()
@@ -322,6 +322,16 @@ $(document).ready(function() {
 		}, catRmErrorHandler);
 	}
 
+	function pwd() {
+		var old_line = "<div class='line'><span class='prompt'>" + current + "</span></div>";
+		$("div#line1").before(old_line);
+	}
+	function help() {
+		var old_line = "<div class='line'><span class='prompt'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[0] + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[1] + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[2] + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[3] + "</span></div><br>";
+		old_line +=  "<div class='line'><spam class='prompt'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[4] + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[5] + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[6] + "</span></div><br>";
+		$("div#line1").before(old_line);
+	}
+
 	function command(fs, cmd) {
 		switch(cmd["comm"]) {
 			case "ls":
@@ -341,6 +351,12 @@ $(document).ready(function() {
 			break;
 			case "rmdir":
 				rmdir(fs, cmd["params"]);
+			break;
+			case "pwd":
+				pwd();
+			break;
+			case "help":
+				help();
 			break;
 			case "exit":
 				window.close();
