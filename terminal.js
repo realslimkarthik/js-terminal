@@ -9,7 +9,7 @@ var after = $('#after');
 var t, pause, wait=0;
 var credentials = [];
 var current = "/";
-var cmdList = ["ls", "cd", "cat", "rm", "mkdir", "rmdir", "pwd", "exit"];
+var cmdList = ["ls", "cd", "cat", "rm", "mkdir", "rmdir", "pwd", "repo", "exit"];
 var possibilities = [];
 
 function blink()
@@ -33,7 +33,8 @@ function welcome() {
 	user = $('#clipboard').val() + "-$ ";
 	$('#username').html(user);
 	$('#after').css('color', '#22FF08');
-	var old_line = "<div class='line'><span class='prompt'>Welcome " + $('#clipboard').val(); + "</span></div>";
+	var old_line = "<div class='line'><span class='prompt'>Welcome " + $('#clipboard').val(); + "</span><br>";
+	old_line += "<span class='prompt'>Use the 'help' command to get a list of implemented commands</span></div><br><br>";
 	$('#clipboard').val('');
 	$('div#line1').before(old_line);
 	pre = 0;
@@ -328,7 +329,12 @@ $(document).ready(function() {
 	}
 	function help() {
 		var old_line = "<div class='line'><span class='prompt'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[0] + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[1] + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[2] + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[3] + "</span></div><br>";
-		old_line +=  "<div class='line'><spam class='prompt'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[4] + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[5] + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[6] + "</span></div><br>";
+		old_line +=  "<div class='line'><spam class='prompt'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[4] + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[5] + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + cmdList[6] + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" +cmdList[7] + "</span></div><br>";
+		$("div#line1").before(old_line);
+	}
+
+	function repo() {
+		var old_line = "<div class='line'><span class='prompt'>Github repo is at <a href='https://github.com/the-real-slim-Karthik/js-terminal'>https://github.com/the-real-slim-Karthik/js-terminal</a></span></div><br>";
 		$("div#line1").before(old_line);
 	}
 
@@ -357,6 +363,9 @@ $(document).ready(function() {
 			break;
 			case "help":
 				help();
+			break;
+			case "repo":
+				repo();
 			break;
 			case "exit":
 				window.close();
