@@ -10,6 +10,7 @@ var t, pause, wait=0;
 var credentials = [];
 var current = "/";
 var cmdList = ["ls", "cd", "cat", "rm", "mkdir", "rmdir", "pwd", "repo", "exit"];
+var ctrl = false;
 var possibilities = [];
 
 function blink()
@@ -68,7 +69,7 @@ function next_line(line)
 		old_line = "<div class='line'><span class='prompt'>" + user + "</span><span></span>" + $("#clipboard").val() + "</div>";
 		old_line += "<div class='line'><span class='prompt'>" + modLine + "</span></div><br>";
 	} else {
-		old_line = "<div class='line'><span class='prompt'>" + modLine + "</span></div><br>";
+		old_line = "<div class='line'><span class='prompt'>" + modLine + "</span></div>";
 	}
 	$("#before").html("");
 	$("#after").html("");
@@ -379,24 +380,33 @@ $(document).ready(function() {
 		$(document).scrollTop(1e4);
 	}
 
+
+$("#clipboard").keydown(function(e){
+	if(e.keyCode == 17)
+		ctrl = true;
+}).keyup(function(e) {
+	if(e.keyCode == 17)
+		ctrl = false;
+});
+
 	function onInitFs(fs) {
 		
-		$("#clipboard").keydown(function() {
-			if(event.which == 13 && pre == 0) {
+		$("#clipboard").keydown(function(e) {
+			if(e.keyCode == 67 && ctrl == true && appendMode == 1) {
+				catWrite(fs, cmd["params"], writeData);
+				$("#username").html(user);
+				return false;
+			}
+			if(e.keyCode == 13 && pre == 0) {
 				next_line($(this).val());
 				if(appendMode == 0) {
 						command(fs, cmd);
 				} else {
-					var lineData = $.trim($(this).val());
-					if(lineData == "!" ) {
-						catWrite(fs, cmd["params"], writeData);
-						$("#username").html(user);
+					var lineData = $.trim($(this).val());		
+					writeData.push(lineData + "\n");
 					}
-					else
-						writeData.push(lineData + "\n");
+					$(this).val("");
 				}
-				$(this).val("");
-			}
 		});
 
   		console.log('Opened file system: ' + fs.name);
