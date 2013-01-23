@@ -393,9 +393,11 @@ $("#clipboard").keydown(function(e){
 		
 		$("#clipboard").keydown(function(e) {
 			if(e.keyCode == 67 && ctrl == true && appendMode == 1) {
+				writeData.push($.trim($(this).val()));
 				catWrite(fs, cmd["params"], writeData);
 				$("#username").html(user);
 				return false;
+				$(this).val("");
 			}
 			if(e.keyCode == 13 && pre == 0) {
 				next_line($(this).val());
