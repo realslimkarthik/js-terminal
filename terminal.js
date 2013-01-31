@@ -335,7 +335,7 @@ $(document).ready(function() {
 	}
 
 	function repo() {
-		var old_line = "<div class='line'><span class='prompt'>Github repo is at <a href='https://github.com/the-real-slim-Karthik/js-terminal'>https://github.com/the-real-slim-Karthik/js-terminal</a></span></div><br>";
+		var old_line = "<div class='line'><span class='prompt'>Github repo is at <a href='https://github.com/realslimkarthik/js-terminal'>https://github.com/realslimkarthik/js-terminal</a></span></div><br>";
 		$("div#line1").before(old_line);
 	}
 
